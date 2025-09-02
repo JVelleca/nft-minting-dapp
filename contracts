@@ -1,33 +1,28 @@
-npm install
-npx hardhat compile
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
 
----
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-### 📄 `package.json`
-```json
-{
-  "name": "nft-minting-dapp",
-  "version": "1.0.0",
-  "description": "A simple DApp for minting NFTs using ERC-721",
-  "scripts": {
-    "test": "npx hardhat test",
-    "compile": "npx hardhat compile",
-    "deploy": "node scripts/deploy.js"
-  },
-  "dependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@openzeppelin/contracts": "^4.8.0",
-    "ethers": "^5.7.0",
-    "hardhat": "^2.14.0"
-  }
+/// @title MyNFT - A simple ERC-721 NFT contract
+/// @notice Allows the owner to mint NFTs with metadata URIs
+contract MyNFT is ERC721URIStorage, Ownable {
+    uint256 private _tokenIds;
+
+    constructor() ERC721("MyNFT Collection", "MNFT") {}
+
+    /// @notice Mint a new NFT to the caller's wallet
+    /// @param tokenURI The metadata URI (e.g. IPFS link) of the NFT
+    /// @return tokenId The ID of the newly minted NFT
+    function mintNFT(string memory tokenURI) public onlyOwner returns (uint256) {
+        _tokenIds++;
+        uint256 newItemId = _tokenIds;
+
+        _mint(msg.sender, newItemId);
+        _setTokenURI(newItemId, tokenURI);
+
+        return newItemId;
+    }
 }
-require("@nomiclabs/hardhat-ethers");
-
-module.exports = {
-  solidity: "0.8.17",
-  networks: {
-    hardhat: {},
-  }
-};
-git add .
-git commit -m "Initial commit: setup project structure with Solidity contract, React app, and README"
+git add contracts/MyNFT.sol
+git commit -m "Add basic ERC-721 smart contract for NFT minting"
