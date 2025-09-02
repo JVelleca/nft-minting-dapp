@@ -1,0 +1,31 @@
+npm install
+npx hardhat compile
+
+---
+
+### 📄 `package.json`
+```json
+{
+  "name": "nft-minting-dapp",
+  "version": "1.0.0",
+  "description": "A simple DApp for minting NFTs using ERC-721",
+  "scripts": {
+    "test": "npx hardhat test",
+    "compile": "npx hardhat compile",
+    "deploy": "node scripts/deploy.js"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@openzeppelin/contracts": "^4.8.0",
+    "ethers": "^5.7.0",
+    "hardhat": "^2.14.0"
+  }
+}
+require("@nomiclabs/hardhat-ethers");
+
+module.exports = {
+  solidity: "0.8.17",
+  networks: {
+    hardhat: {},
+  }
+};
