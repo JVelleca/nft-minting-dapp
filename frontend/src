@@ -1,0 +1,91 @@
+npx create-react-app nft-minting-dapp
+cd nft-minting-dapp
+npm install ethers
+
+export const CONTRACT_ADDRESS = "0xYourDeployedContract"; // replace
+export const ABI = [
+  // paste the ABI from artifacts/contracts/MyNFT.json after deployment
+];
+
+import React, { useState } from "react";
+import { ethers } from "ethers";
+import { CONTRACT_ADDRESS, ABI } from "../config";
+
+const WalletConnect = () => {
+  const [account, setAccount] = useState(null);
+  const [status, setStatus] = useState("");
+
+  // Connect Wallet
+  const connectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        setAccount(accounts[0]);
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      alert("MetaMask not detected!");
+    }
+  };
+
+  // Mint NFT
+  const mintNFT = async () => {
+    if (!account) return alert("Connect wallet first!");
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+    try {
+      setStatus("Minting...");
+      const tx = await contract.mintNFT("ipfs://QmExampleMetadataHash");
+      await tx.wait();
+      setStatus("✅ NFT Minted Successfully!");
+    } catch (err) {
+      console.error(err);
+      setStatus("❌ Transaction failed");
+    }
+  };
+
+  return (
+    <div className="p-6 bg-gray-100 rounded-2xl shadow-lg text-center">
+      <h2 className="text-xl font-bold mb-4">NFT Minting DApp</h2>
+      
+      {account ? (
+        <p className="mb-2">Connected: {account}</p>
+      ) : (
+        <button
+          onClick={connectWallet}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow"
+        >
+          Connect Wallet
+        </button>
+      )}
+
+      <button
+        onClick={mintNFT}
+        className="mt-4 px-4 py-2 bg-green-500 text-white rounded-lg shadow"
+      >
+        Mint NFT
+      </button>
+
+      <p className="mt-3">{status}</p>
+    </div>
+  );
+};
+
+export default WalletConnect;
+
+import React from "react";
+import WalletConnect from "./components/WalletConnect";
+
+function App() {
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <WalletConnect />
+    </div>
+  );
+}
+
+export default App;
